@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("bricks04.holoCheck")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+44b1aaef9081853b5cb7a28f77aaa668f8dad9bf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+057894d2d90063b7515bc32dead03e7b69e464d2")]
 [assembly: System.Reflection.AssemblyProductAttribute("HoloCheck")]
 [assembly: System.Reflection.AssemblyTitleAttribute("bricks04.holoCheck")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

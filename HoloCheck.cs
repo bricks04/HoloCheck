@@ -14,6 +14,7 @@ namespace HoloCheck
 
         public ConfigEntry<string> configAllowedSteamIDs = null!;
         internal new static string[] allowedSteamIDs;
+        internal static int targetVersion = 0;
 
         private void Awake()
         {

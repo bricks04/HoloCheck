@@ -1,19 +1,9 @@
 ﻿using HarmonyLib;
-using Steamworks.Data;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System;
-using System.Collections;
 using System.Text;
-using System.Text.RegularExpressions;
-using GameNetcodeStuff;
-using Netcode.Transports.Facepunch;
-using Steamworks;
 using Unity.Netcode;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using System.Buffers;
+
 
 namespace HoloCheck.Patches
 {
@@ -59,6 +49,7 @@ namespace HoloCheck.Patches
 
                 //Array[1] is the Steam Id. Use this to compare list
                 HoloCheck.Logger.LogInfo("Steam ID = " + array[1]);
+                HoloCheck.Logger.LogInfo(HoloCheck.allowedSteamIDs);
                 if (HoloCheck.allowedSteamIDs.Contains(array[1]))
                 {
                     HoloCheck.Logger.LogWarning("User " + array[1] + " was approved to join the server! ");
@@ -76,6 +67,7 @@ namespace HoloCheck.Patches
                 //Set the response.approved to what the flag is
                 response.Approved = flag;
                 //No need to return anything, just have the response variables done and dusted
+                //POSSIBLE ISSUE - Player entities still seem to remain if they are removed with this method. Check if this is ok?
             }
         }
     }
