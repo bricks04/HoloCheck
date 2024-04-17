@@ -7,3 +7,4 @@ C:\Users\brick\Documents\lethalMod\holoCheck\HoloCheck\HoloCheck\obj\Debug\netst
 C:\Users\brick\Documents\lethalMod\holoCheck\HoloCheck\HoloCheck\obj\Debug\netstandard2.1\HoloCheck.AssemblyInfo.cs
 C:\Users\brick\Documents\lethalMod\holoCheck\HoloCheck\HoloCheck\obj\Debug\netstandard2.1\HoloCheck.csproj.CoreCompileInputs.cache
 C:\Users\brick\Documents\lethalMod\holoCheck\HoloCheck\HoloCheck\obj\Debug\netstandard2.1\bricks04.holoCheck.dll
+C:\Users\brick\Documents\lethalMod\holoCheck\HoloCheck\HoloCheck\obj\Debug\netstandard2.1\HoloCheck.sourcelink.json

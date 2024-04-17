@@ -51,6 +51,12 @@ namespace HoloCheck.Patches
                 //Can't extract variables in a function, so we regenerate request payload variables
                 string @string = Encoding.ASCII.GetString(request.Payload);
                 string[] array = @string.Split(",");
+                //DEBUG - Show whats in the payload
+                foreach (String item in array)
+                {
+                    HoloCheck.Logger.LogInfo(item);
+                }
+
                 //Array[1] is the Steam Id. Use this to compare list
                 HoloCheck.Logger.LogInfo("Steam ID = " + array[1]);
                 if (HoloCheck.allowedSteamIDs.Contains(array[1]))
