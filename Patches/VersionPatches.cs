@@ -19,7 +19,7 @@ namespace HoloCheck.Patches
                 HoloCheck.Logger.LogWarning("Detected manipulation of Version Number from MoreCompany, applying quick-fix");
                 //Offset should be 9950 + originalVersion - numberofAdditionalMods.
                 //To prevent version level modlist checking, add by 1 to hide this mod.
-                __instance.gameVersionNum += 1;
+                //__instance.gameVersionNum += 1;
                 HoloCheck.Logger.LogInfo("The new version is = " + __instance.gameVersionNum.ToString());
                 HoloCheck.targetVersion = __instance.gameVersionNum;
             }
