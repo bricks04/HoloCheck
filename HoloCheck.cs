@@ -2,6 +2,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using System.Linq;
 
 namespace HoloCheck
 {
@@ -37,7 +38,7 @@ namespace HoloCheck
                                                 "",
                                                 "A comma-separated string, containing a list of Steam IDs that you wish to allow entry into your servers. Ensure that there is no whitespace in the string. Example - '123456789,987654321,011131017'. YOUR STEAM ID IS NOT THE SAME THING AS THE STEAM FRIEND CODE! Obtain steam IDs by going to your profile, and taking the numbers at the end of the URL. ");
 
-            string @string = configAllowedSteamIDs.Value;
+            string @string = (string)configAllowedSteamIDs.BoxedValue;
             allowedSteamIDs = @string.Split(",");
 
             Logger = base.Logger;
