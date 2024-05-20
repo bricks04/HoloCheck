@@ -7,8 +7,8 @@ namespace HoloCheck.Patches
     public class VersionPatches
     {
 
-        [HarmonyPatch("ConnectionApproval")]
-        [HarmonyPrefix]
+        //[HarmonyPatch("ConnectionApproval")]
+        //[HarmonyPrefix]
         private static void AwakePostFix(GameNetworkManager __instance)
         {
             HoloCheck.Logger.LogInfo("VersionPatches awoken!");

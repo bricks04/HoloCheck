@@ -1,27 +1,33 @@
 ﻿using HarmonyLib;
+using System.IO;
+using System.Reflection;
+using UnityEngine;
 
 
 namespace HoloCheck.Patches
 {
-    //[HarmonyPatch(typeof(GameNetworkManager))]
+    [HarmonyPatch(typeof(MenuManager))]
     public class UIPatches
     {
+        public static AssetBundle HoloCheckUIAssets;
 
-        //[HarmonyPatch("ConnectionApproval")]
-        //[HarmonyPrefix]
-        private static void AwakePostFix(GameNetworkManager __instance)
+        //Patch disabled as not ready yet
+        //[HarmonyPatch("Awake")]
+        //[HarmonyPostfix]
+        private static void Awake()
         {
-            HoloCheck.Logger.LogInfo("VersionPatches awoken!");
-            //MORECOMPANY case - Check if MoreCompany is in effect
-            HoloCheck.Logger.LogInfo("Detected Version = " + __instance.gameVersionNum.ToString());
-            if (__instance.gameVersionNum > 9950 && __instance.gameVersionNum != HoloCheck.targetVersion)
+            // Load external asset pack that contains basic UI stuff, and instantiate them in the same way MoreCompanyAssets does
+            string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            HoloCheckUIAssets = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "holocheckuipack"));
+            if (HoloCheckUIAssets == null)
             {
-                HoloCheck.Logger.LogWarning("Detected manipulation of Version Number from MoreCompany, applying quick-fix");
-                //Offset should be 9950 + originalVersion - numberofAdditionalMods.
-                //To prevent version level modlist checking, add by 1 to hide this mod.
-                //__instance.gameVersionNum += 1;
-                HoloCheck.Logger.LogInfo("The new version is = " + __instance.gameVersionNum.ToString());
-                HoloCheck.targetVersion = __instance.gameVersionNum;
+                HoloCheck.Logger.LogError("Failed to load custom assets. You can safely ignore this error. "); // ManualLogSource for your plugin
+                return;
+            }
+            else
+            {
+                HoloCheck.Logger.LogInfo("Custom assets loaded!");
             }
         }
     }
