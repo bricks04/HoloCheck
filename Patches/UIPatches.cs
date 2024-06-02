@@ -19,7 +19,7 @@ namespace HoloCheck.Patches
             // Load external asset pack that contains basic UI stuff, and instantiate them in the same way MoreCompanyAssets does
             string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            HoloCheckUIAssets = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "holocheckuipack"));
+            HoloCheckUIAssets = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "holocheckassetbundle"));
             if (HoloCheckUIAssets == null)
             {
                 HoloCheck.Logger.LogError("Failed to load custom assets. You can safely ignore this error. "); // ManualLogSource for your plugin
