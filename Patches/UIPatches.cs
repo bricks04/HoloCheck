@@ -21,8 +21,8 @@ namespace HoloCheck.Patches
         public static GameObject disableHoloCheckSettingsButton;
         public static GameObject settingsPanel;
 
-        [HarmonyPatch("Awake")]
-        [HarmonyPrefix]
+        //[HarmonyPatch("Awake")]
+        //[HarmonyPrefix]
         private static void AwakePrefix()
         {
             // Load external asset pack that contains basic UI stuff, and instantiate them in the same way MoreCompanyAssets does
