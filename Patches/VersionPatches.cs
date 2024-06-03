@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System;
 
 
 namespace HoloCheck.Patches
@@ -6,22 +7,29 @@ namespace HoloCheck.Patches
     [HarmonyPatch(typeof(GameNetworkManager))]
     public class VersionPatches
     {
-
-        //[HarmonyPatch("ConnectionApproval")]
-        //[HarmonyPrefix]
+        // Modify the version number directly so that it now contains a combination of the Password and the Version.
+        [HarmonyPatch("Start")]
+        [HarmonyPrefix]
         private static void AwakePostFix(GameNetworkManager __instance)
         {
             HoloCheck.Logger.LogInfo("VersionPatches awoken!");
-            //MORECOMPANY case - Check if MoreCompany is in effect
-            HoloCheck.Logger.LogInfo("Detected Version = " + __instance.gameVersionNum.ToString());
-            if (__instance.gameVersionNum > 9950 && __instance.gameVersionNum != HoloCheck.targetVersion)
+            if (HoloCheck.originalVersion == 0)
             {
-                HoloCheck.Logger.LogWarning("Detected manipulation of Version Number from MoreCompany, applying quick-fix");
-                //Offset should be 9950 + originalVersion - numberofAdditionalMods.
-                //To prevent version level modlist checking, add by 1 to hide this mod.
-                //__instance.gameVersionNum += 1;
+                HoloCheck.originalVersion = __instance.gameVersionNum;
+            }
+            HoloCheck.Logger.LogInfo("Original Version = " + HoloCheck.originalVersion.ToString());
+            HoloCheck.targetVersion = Int32.Parse((HoloCheck.passkey + HoloCheck.originalVersion)); 
+            HoloCheck.Logger.LogInfo("Detected Version = " + __instance.gameVersionNum.ToString());
+            HoloCheck.Logger.LogInfo("Target Version = " + HoloCheck.targetVersion.ToString());
+            if (__instance.gameVersionNum != HoloCheck.targetVersion)
+            {
+                __instance.gameVersionNum = HoloCheck.targetVersion;
+                HoloCheck.Logger.LogInfo("Detected version number does not match the intended version number, applying fix");
                 HoloCheck.Logger.LogInfo("The new version is = " + __instance.gameVersionNum.ToString());
-                HoloCheck.targetVersion = __instance.gameVersionNum;
+            }
+            else
+            {
+                HoloCheck.Logger.LogWarning("Detected version matches the target version! Your lobbies will not have Passkey protection enabled! ");
             }
         }
     }

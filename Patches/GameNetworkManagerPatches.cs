@@ -22,7 +22,13 @@ namespace HoloCheck.Patches
         [HarmonyPostfix]
         private static void ConnectionApprovalPostFix(GameNetworkManager __instance, NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
-            HoloCheck.Logger.LogInfo("A connection approval check happened!");
+            CheckForSteamID(__instance, request, response);
+            CheckForPassPIN(__instance, request, response);
+        }
+
+        private static void CheckForSteamID(GameNetworkManager __instance, NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        {
+            HoloCheck.Logger.LogInfo("A connection approval check happened! Checking for steamID");
             HoloCheck.Logger.LogInfo(__instance.disallowConnection);
             HoloCheck.Logger.LogInfo(__instance.disableSteam);
             HoloCheck.Logger.LogInfo(response.Approved);
@@ -68,6 +74,35 @@ namespace HoloCheck.Patches
                 response.Approved = flag;
                 //No need to return anything, just have the response variables done and dusted
                 //POSSIBLE ISSUE - Player entities still seem to remain if they are removed with this method. Check if this is ok?
+            }
+        }
+
+        private static void CheckForPassPIN(GameNetworkManager __instance, NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        {
+            HoloCheck.Logger.LogInfo("A connection approval check happened! Checking for pass");
+
+            bool flag = response.Approved;
+            if (!__instance.disallowConnection)
+            {
+                //Can't extract variables in a function, so we regenerate request payload variables
+                string @string = Encoding.ASCII.GetString(request.Payload);
+                string[] array = @string.Split(",");
+
+                //Array[0] is the Version ID. In a correct PIN scenario, the correct ID is {PIN HERE}{ORIGINAL VERSION HERE} eg. pin 1234, version 50 = 123450
+                HoloCheck.Logger.LogInfo("Attempted Version = " + array[0]);
+                if (array[0] == HoloCheck.targetVersion.ToString())
+                {
+                    HoloCheck.Logger.LogWarning("User's password matches.");
+                }
+                else
+                {
+                    HoloCheck.Logger.LogWarning("User attempted to join the server, but has been denied because their passkey does not match. Overriding any previous connection approval.");
+                    response.Reason = "Your account has not been approved to join this server.";
+                    flag = false;
+                }
+
+                //Set the response.approved to what the flag is
+                response.Approved = flag;
             }
         }
     }

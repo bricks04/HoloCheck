@@ -15,7 +15,13 @@ namespace HoloCheck
 
         public ConfigEntry<string> configAllowedSteamIDs = null!;
         internal new static string[] allowedSteamIDs;
-        internal static int targetVersion = 0;
+        internal static int originalVersion = 0;
+        internal static int targetVersion = 999950;
+
+        public ConfigEntry<string> ConfigPasskey = null!;
+        public static string passkey = "";
+
+        public static bool displaySettings = false;
 
         private void Awake()
         {
@@ -38,14 +44,21 @@ namespace HoloCheck
                                                 "",
                                                 "A comma-separated string, containing a list of Steam IDs that you wish to allow entry into your servers. Ensure that there is no whitespace in the string. Example - '123456789,987654321,011131017'. YOUR STEAM ID IS NOT THE SAME THING AS THE STEAM FRIEND CODE! Obtain steam IDs by going to your profile, and taking the numbers at the end of the URL. ");
 
+            ConfigPasskey = Config.Bind("General",
+                                                "Passkey Checking",
+                                                "",
+                                                "A collection of numbers that must match people joining your lobby before they will be allowed to enter. Leave blank to disable.");
+
             string @string = (string)configAllowedSteamIDs.BoxedValue;
             allowedSteamIDs = @string.Split(",");
+
+            passkey = (string)ConfigPasskey.BoxedValue;
 
             Logger = base.Logger;
             Instance = this;
 
             Patch();
-
+            Logger.LogInfo($"Passkey = {passkey}, Steam IDs = {allowedSteamIDs}");
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
         }
 
