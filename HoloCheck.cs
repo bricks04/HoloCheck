@@ -51,6 +51,10 @@ namespace HoloCheck
 
             string @string = (string)configAllowedSteamIDs.BoxedValue;
             allowedSteamIDs = @string.Split(",");
+            if (allowedSteamIDs[0] == "")
+            {
+                allowedSteamIDs = [];
+            }
 
             passkey = (string)ConfigPasskey.BoxedValue;
 
@@ -58,7 +62,7 @@ namespace HoloCheck
             Instance = this;
 
             Patch();
-            Logger.LogInfo($"Passkey = {passkey}, Steam IDs = {allowedSteamIDs}");
+            Logger.LogInfo($"Passkey = {passkey}, Steam IDs = {allowedSteamIDs.Length}");
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
         }
 

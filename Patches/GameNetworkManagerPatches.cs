@@ -10,7 +10,6 @@ namespace HoloCheck.Patches
     [HarmonyPatch(typeof(GameNetworkManager))]
     public class GameNetworkManagerPatches
     {
-
         [HarmonyPatch("Awake")]
         [HarmonyPostfix]
         private static void AwakePostFix()

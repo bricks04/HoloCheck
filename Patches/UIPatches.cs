@@ -21,8 +21,13 @@ namespace HoloCheck.Patches
         public static GameObject disableHoloCheckSettingsButton;
         public static GameObject settingsPanel;
 
-        //[HarmonyPatch("Awake")]
-        //[HarmonyPrefix]
+        public static GameObject passkeyField;
+        public static GameObject pendingChangesAlert;
+        public static GameObject revealPasskeyButton;
+        public static GameObject changePasskeyButton;
+
+        [HarmonyPatch("Awake")]
+        [HarmonyPrefix]
         private static void AwakePrefix()
         {
             // Load external asset pack that contains basic UI stuff, and instantiate them in the same way MoreCompanyAssets does
@@ -43,27 +48,38 @@ namespace HoloCheck.Patches
         }
 
         //Patch disabled as not ready yet
-        //[HarmonyPatch("Awake")]
-        //[HarmonyPostfix]
+        [HarmonyPatch("Awake")]
+        [HarmonyPostfix]
         private static void AwakePostfix()
         {
             try
             {
                 // Begin Construction
+                //holoCheckUI = The object data loaded from the assetpack. Treat this like your instantiate template
+                //instantiatedUI = The actual objects in game. Use this to listen for user input and stuff.
                 holoCheckUI = HoloCheckUIAssets.LoadAsset<GameObject>("HoloCheckUI");
                 instantiatedUI = GameObject.Instantiate(holoCheckUI);
 
-                enableHoloCheckSettingsButton = holoCheckUI.transform.Find("Canvas").Find("ActivateButton").gameObject;
-                HoloCheck.Logger.LogInfo(enableHoloCheckSettingsButton);
-                disableHoloCheckSettingsButton = holoCheckUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Back Button").gameObject;
-                HoloCheck.Logger.LogInfo(disableHoloCheckSettingsButton);
-                settingsPanel = holoCheckUI.transform.Find("Canvas").Find("HoloCheckPanel").gameObject;
+                enableHoloCheckSettingsButton = instantiatedUI.transform.Find("Canvas").Find("ActivateButton").gameObject;
+                //HoloCheck.Logger.LogInfo(enableHoloCheckSettingsButton);
+                disableHoloCheckSettingsButton = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Back Button").gameObject;
+                //HoloCheck.Logger.LogInfo(disableHoloCheckSettingsButton);
+                settingsPanel = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").gameObject;
+                passkeyField = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Passkey Mode").Find("Passkey Field").gameObject;
+                pendingChangesAlert = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Passkey Mode").Find("Unsaved Changes Label").gameObject;
+                revealPasskeyButton = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Passkey Mode").Find("Reveal Button").gameObject;
+                changePasskeyButton = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Passkey Mode").Find("Change Button").gameObject;
 
-                HoloCheck.Logger.LogInfo(enableHoloCheckSettingsButton.GetComponent<Button>());
-                //How do I assign listeners? This doesnt work
+                passkeyField.GetComponent<TMP_InputField>().text = "****";
+
+                //HoloCheck.Logger.LogInfo(enableHoloCheckSettingsButton.GetComponent<Button>());
+
                 enableHoloCheckSettingsButton.GetComponent<Button>().onClick.AddListener(EnableHoloCheckSettingsPanel);
+                disableHoloCheckSettingsButton.GetComponent<Button>().onClick.AddListener(DisableHoloCheckSettingsPanel);
+                revealPasskeyButton.GetComponent<Button>().onClick.AddListener(RevealPasskeyButton);
+                changePasskeyButton.GetComponent<Button>().onClick.AddListener(ChangePasskeyButton);
                 // Debugging stuff
-                EnableHoloCheckSettingsPanel();
+                //EnableHoloCheckSettingsPanel();
 
                 PopulateUserList();
             }
@@ -80,6 +96,7 @@ namespace HoloCheck.Patches
             HoloCheck.displaySettings = true;
             settingsPanel.SetActive(true);
             enableHoloCheckSettingsButton.SetActive(false);
+            pendingChangesAlert.SetActive(false);
         }
 
         private static void DisableHoloCheckSettingsPanel()
@@ -88,6 +105,37 @@ namespace HoloCheck.Patches
             HoloCheck.displaySettings = false;
             settingsPanel.SetActive(false);
             enableHoloCheckSettingsButton.SetActive(true);
+        }
+
+        private static void ChangePasskeyButton()
+        {
+            HoloCheck.Logger.LogInfo("Change Passkey button pressed! Attempting to change passkey to " + passkeyField.GetComponent<TMP_InputField>().text);
+            if (int.TryParse(passkeyField.GetComponent<TMP_InputField>().text, out int result))
+            {
+                HoloCheck.passkey = passkeyField.GetComponent<TMP_InputField>().text;
+                VersionPatches.ChangePasskey(HoloCheck.passkey);
+                pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Change successful.";
+                pendingChangesAlert.SetActive(true);
+            }
+            else
+            {
+                HoloCheck.Logger.LogError("Entered passkey value is not a number!");
+                pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Entered value is not a number!";
+                pendingChangesAlert.SetActive(true);
+            }
+            
+        }
+
+        private static void RevealPasskeyButton()
+        {
+            if (passkeyField.GetComponent<TMP_InputField>().text == "****")
+            {
+                passkeyField.GetComponent<TMP_InputField>().text = HoloCheck.passkey;
+            }
+            else
+            {
+                passkeyField.GetComponent<TMP_InputField>().text = "****";
+            }
         }
 
         private static void PopulateUserList()

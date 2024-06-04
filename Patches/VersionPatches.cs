@@ -7,10 +7,28 @@ namespace HoloCheck.Patches
     [HarmonyPatch(typeof(GameNetworkManager))]
     public class VersionPatches
     {
+        private static GameNetworkManager instance;
         // Modify the version number directly so that it now contains a combination of the Password and the Version.
         [HarmonyPatch("Start")]
         [HarmonyPrefix]
-        private static void AwakePostFix(GameNetworkManager __instance)
+        private static void StartPostFix(GameNetworkManager __instance)
+        {
+            instance = __instance;
+            ChangeVersionWithPasskey(HoloCheck.passkey, __instance);
+        }
+
+        [HarmonyPatch("JoinLobby")]
+        [HarmonyPrefix]
+        private static void JoinLobbyPrefix(GameNetworkManager __instance)
+        {
+            ChangeVersionWithPasskey(HoloCheck.passkey, __instance);
+        }
+
+        public static void ChangePasskey(string passkey)
+        {
+            ChangeVersionWithPasskey(passkey, instance);
+        }
+        private static void ChangeVersionWithPasskey(string passkey, GameNetworkManager __instance)
         {
             HoloCheck.Logger.LogInfo("VersionPatches awoken!");
             if (HoloCheck.originalVersion == 0)
@@ -18,7 +36,17 @@ namespace HoloCheck.Patches
                 HoloCheck.originalVersion = __instance.gameVersionNum;
             }
             HoloCheck.Logger.LogInfo("Original Version = " + HoloCheck.originalVersion.ToString());
-            HoloCheck.targetVersion = Int32.Parse((HoloCheck.passkey + HoloCheck.originalVersion)); 
+            //If passkey exists, add a 1 to indicate active HoloCheck
+            //Otherwise, leave the target version alone.
+            if (HoloCheck.passkey != "")
+            {
+                HoloCheck.targetVersion = Int32.Parse(("1" + passkey + HoloCheck.originalVersion.ToString()));
+            }
+            else
+            {
+                HoloCheck.targetVersion = HoloCheck.originalVersion;
+            }
+
             HoloCheck.Logger.LogInfo("Detected Version = " + __instance.gameVersionNum.ToString());
             HoloCheck.Logger.LogInfo("Target Version = " + HoloCheck.targetVersion.ToString());
             if (__instance.gameVersionNum != HoloCheck.targetVersion)
