@@ -21,7 +21,10 @@ namespace HoloCheck.Patches
         [HarmonyPostfix]
         private static void ConnectionApprovalPostFix(GameNetworkManager __instance, NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
-            CheckForSteamID(__instance, request, response);
+            if (HoloCheck.allowedSteamIDs.Length > 0) 
+            {
+                CheckForSteamID(__instance, request, response);
+            }
             CheckForPassPIN(__instance, request, response);
         }
 

@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Steamworks;
+using UnityEngine.Device;
 
 
 namespace HoloCheck.Patches
@@ -22,9 +23,13 @@ namespace HoloCheck.Patches
         public static GameObject settingsPanel;
 
         public static GameObject passkeyField;
+        public static GameObject passkeyMode;
         public static GameObject pendingChangesAlert;
         public static GameObject revealPasskeyButton;
         public static GameObject changePasskeyButton;
+
+        private static RectTransform settingsClosedPasskeyPosition;
+        private static RectTransform settingsOpenPasskeyPosition;
 
         [HarmonyPatch("Awake")]
         [HarmonyPrefix]
@@ -65,10 +70,14 @@ namespace HoloCheck.Patches
                 disableHoloCheckSettingsButton = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Back Button").gameObject;
                 //HoloCheck.Logger.LogInfo(disableHoloCheckSettingsButton);
                 settingsPanel = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").gameObject;
-                passkeyField = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Passkey Mode").Find("Passkey Field").gameObject;
-                pendingChangesAlert = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Passkey Mode").Find("Unsaved Changes Label").gameObject;
-                revealPasskeyButton = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Passkey Mode").Find("Reveal Button").gameObject;
-                changePasskeyButton = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Passkey Mode").Find("Change Button").gameObject;
+                passkeyMode = instantiatedUI.transform.Find("Canvas").Find("Passkey Mode").gameObject;
+                passkeyField = instantiatedUI.transform.Find("Canvas").Find("Passkey Mode").Find("Passkey Field").gameObject;
+                pendingChangesAlert = instantiatedUI.transform.Find("Canvas").Find("Passkey Mode").Find("Unsaved Changes Label").gameObject;
+                revealPasskeyButton = instantiatedUI.transform.Find("Canvas").Find("Passkey Mode").Find("Reveal Button").gameObject;
+                changePasskeyButton = instantiatedUI.transform.Find("Canvas").Find("Passkey Mode").Find("Change Button").gameObject;
+
+                settingsClosedPasskeyPosition = instantiatedUI.transform.Find("Canvas").Find("Menu Closed Passkey").gameObject.GetComponent<RectTransform>();
+                settingsOpenPasskeyPosition = instantiatedUI.transform.Find("Canvas").Find("Menu Opened Passkey").gameObject.GetComponent<RectTransform>();
 
                 passkeyField.GetComponent<TMP_InputField>().text = "****";
 
@@ -96,7 +105,6 @@ namespace HoloCheck.Patches
             HoloCheck.displaySettings = true;
             settingsPanel.SetActive(true);
             enableHoloCheckSettingsButton.SetActive(false);
-            pendingChangesAlert.SetActive(false);
         }
 
         private static void DisableHoloCheckSettingsPanel()
@@ -110,12 +118,22 @@ namespace HoloCheck.Patches
         private static void ChangePasskeyButton()
         {
             HoloCheck.Logger.LogInfo("Change Passkey button pressed! Attempting to change passkey to " + passkeyField.GetComponent<TMP_InputField>().text);
-            if (int.TryParse(passkeyField.GetComponent<TMP_InputField>().text, out int result))
+            if (int.TryParse(passkeyField.GetComponent<TMP_InputField>().text, out int result) | passkeyField.GetComponent<TMP_InputField>().text.Length == 0)
             {
-                HoloCheck.passkey = passkeyField.GetComponent<TMP_InputField>().text;
-                VersionPatches.ChangePasskey(HoloCheck.passkey);
-                pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Change successful.";
-                pendingChangesAlert.SetActive(true);
+                if (passkeyField.GetComponent<TMP_InputField>().text.Length <= 4)
+                {
+                    HoloCheck.passkey = passkeyField.GetComponent<TMP_InputField>().text;
+                    VersionPatches.ChangePasskey(HoloCheck.passkey);
+                    HoloCheck.SaveConfig();
+                    pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Change successful.";
+                    pendingChangesAlert.SetActive(true);
+                }
+                else
+                {
+                    HoloCheck.Logger.LogError("Entered passkey value is too long!");
+                    pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Entered value too long! (4 max)";
+                    pendingChangesAlert.SetActive(true);
+                }
             }
             else
             {
@@ -151,7 +169,7 @@ namespace HoloCheck.Patches
             {
                 GameObject entry = GameObject.Instantiate(originalEntry, parent.transform);
                 entry.transform.GetChild(0).gameObject.GetComponentInChildren<TextMeshProUGUI>().text = steamId;
-                entry.transform.GetChild(1).gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "This is my username!";
+                entry.transform.GetChild(1).gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "Username unknown.";
                 //SteamId steamIdObject = new SteamId();
                 //HoloCheck.Logger.LogInfo(Steamworks.SteamFriends.RequestUserInformation(steamIdObject));
             }
