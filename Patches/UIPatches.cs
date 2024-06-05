@@ -91,6 +91,7 @@ namespace HoloCheck.Patches
                 //EnableHoloCheckSettingsPanel();
 
                 PopulateUserList();
+                RewriteRuleset();
             }
             catch (Exception e)
             {
@@ -127,6 +128,7 @@ namespace HoloCheck.Patches
                     HoloCheck.SaveConfig();
                     pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Change successful.";
                     pendingChangesAlert.SetActive(true);
+                    RewriteRuleset();
                 }
                 else
                 {
@@ -169,12 +171,26 @@ namespace HoloCheck.Patches
             {
                 GameObject entry = GameObject.Instantiate(originalEntry, parent.transform);
                 entry.transform.GetChild(0).gameObject.GetComponentInChildren<TextMeshProUGUI>().text = steamId;
-                entry.transform.GetChild(1).gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "Username unknown.";
                 //SteamId steamIdObject = new SteamId();
                 //HoloCheck.Logger.LogInfo(Steamworks.SteamFriends.RequestUserInformation(steamIdObject));
             }
             // End the list
             GameObject.Instantiate(endOfList, parent.transform);
+        }
+
+        private static void RewriteRuleset()
+        {
+            GameObject rulesetObject = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("CurrentRulesetBorder").Find("Text (TMP)").gameObject;
+            string result = "Active Ruleset: \n\n";
+            if (HoloCheck.passkey != "")
+            {
+                result = result + "> Users must install HoloCheck TESTv0.0.2\n\n> Users must enter the correct passkey\n\n";
+            }
+            if (HoloCheck.allowedSteamIDs.Length > 0)
+            {
+                result = result + "> The user's SteamID must be present on the whitelist.\nWhitelist Length : " + HoloCheck.allowedSteamIDs.Length.ToString() + "\n\n";
+            }
+            rulesetObject.GetComponent<TextMeshProUGUI>().text = result;
         }
     }
 }
