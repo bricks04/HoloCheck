@@ -32,10 +32,10 @@ namespace HoloCheck
                                                 "",
                                                 "A comma-separated string, containing a list of Steam IDs that you wish to allow entry into your servers. Ensure that there is no whitespace in the string. Example - '123456789,987654321,011131017'. YOUR STEAM ID IS NOT THE SAME THING AS THE STEAM FRIEND CODE! Obtain steam IDs by going to your profile, and taking the numbers at the end of the URL. ");
 
-            configPasskey = cfg.Bind("General",
-                                                "Passkey Checking",
-                                                "",
-                                                "A collection of numbers that must match people joining your lobby before they will be allowed to enter. Leave blank to disable.");
+            //configPasskey = cfg.Bind("General",
+            //                                    "Passkey Checking",
+            //                                    "",
+            //                                    "A collection of numbers that must match people joining your lobby before they will be allowed to enter. Leave blank to disable.");
         }
     }
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
@@ -56,7 +56,7 @@ namespace HoloCheck
 
         public static void SaveConfig()
         {
-            BoundConfig.configPasskey.BoxedValue = passkey;
+            //BoundConfig.configPasskey.BoxedValue = passkey;
             string saveResult = "";
             foreach (var item in allowedSteamIDs)
             {
@@ -76,7 +76,7 @@ namespace HoloCheck
                 allowedSteamIDs = [];
             }
 
-            passkey = (string)BoundConfig.configPasskey.BoxedValue;
+            passkey = "";
 
             Logger = base.Logger;
             Instance = this;
