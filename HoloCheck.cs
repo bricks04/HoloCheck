@@ -16,12 +16,7 @@ namespace HoloCheck
             cfg.Bind("General",
                         "READ ME",
                         "PLEASE READ ME",
-                        "Before playing, please obtain the steam IDs of everyone you wish to allow into the server. A steam ID check will be performed regardless of if you use a private or public server, please disable the mod if you want to allow users freely. This mod will not work if you use LAN mode.");
-            cfg.Bind("General",
-                        "Permission Statement and Notice",
-                        "",
-                        "Where it is required, I, the creator of the HoloCheck mod, grant express permission to those that wish to use this mod to create Lethal Company content, or to assist with the creation of said content. The code is provided AS IS, and no express warranty or guarantee of performance or functionality is provided. By installing and running this mod, you agree that you understand the risks of utilising mods, including the risk of save file/game damage. "
-                        );
+                        "To use whitelisting, please obtain the steam IDs of everyone you wish to allow into the server. While active, a steam ID check will be performed regardless of if you use a private or public server. Whitelisting will not work if you use LAN mode.");
             cfg.Bind("General",
                         "Contact",
                         "andrew3199 or Xitter@bricks041lol, email bricks041@gmail.com",
