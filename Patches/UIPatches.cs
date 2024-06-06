@@ -184,7 +184,7 @@ namespace HoloCheck.Patches
             string result = "Active Ruleset: \n\n";
             if (HoloCheck.passkey != "")
             {
-                result = result + "> Users must install HoloCheck TESTv0.0.2\n\n> Users must enter the correct passkey\n\n";
+                result = result + "> Users must install HoloCheck\n\n> Users must enter the correct passkey\n\n";
             }
             if (HoloCheck.allowedSteamIDs.Length > 0)
             {
