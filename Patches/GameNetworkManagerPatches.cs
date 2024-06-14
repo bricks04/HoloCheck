@@ -3,6 +3,7 @@ using System.Linq;
 using System;
 using System.Text;
 using Unity.Netcode;
+using Steamworks;
 
 
 namespace HoloCheck.Patches
@@ -21,11 +22,39 @@ namespace HoloCheck.Patches
         [HarmonyPostfix]
         private static void ConnectionApprovalPostFix(GameNetworkManager __instance, NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
+            // Debug, highly inefficient as we decode the payload later anyway.
+            HoloCheck.Logger.LogInfo("Decoded Payload of joiner : " + Encoding.ASCII.GetString(request.Payload));
             if (HoloCheck.allowedSteamIDs.Length > 0) 
             {
                 CheckForSteamID(__instance, request, response);
             }
             CheckForPassPIN(__instance, request, response);
+        }
+
+        [HarmonyPatch("SetConnectionDataBeforeConnecting")]
+        [HarmonyPostfix]
+        // Issue - MoreCompany LAN overrides the payload to store the intended lobby size. Either read the payload and transplant the lobby size to the new payload, or disable this check in LAN.
+        [HarmonyAfter(["me.swipez.melonloader.morecompany"])]
+        private static void SetConnectionDataPostFix(GameNetworkManager __instance)
+        {
+            HoloCheck.Logger.LogInfo("Checking Connection data = " + Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            // Check if Payload injection method is active, if so, inject passcode into payload.
+            if (HoloCheck.payloadInjection)
+            {
+                __instance.localClientWaitingForApproval = true;
+                HoloCheck.Logger.LogInfo("Pass to inject: " + HoloCheck.passkey.ToString());
+                // gameVersionNum,SteamId,Passkey
+                if (__instance.disableSteam)
+                {
+                    NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes(__instance.gameVersionNum.ToString() + "," + 32 + "," + HoloCheck.passkey.ToString());
+                }
+                else
+                {
+                    NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes(__instance.gameVersionNum + "," + (ulong)SteamClient.SteamId + "," + HoloCheck.passkey.ToString());
+                }
+                HoloCheck.Logger.LogInfo("Post-injection Connection data = " + Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
+            }
+            
         }
 
         private static void CheckForSteamID(GameNetworkManager __instance, NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)

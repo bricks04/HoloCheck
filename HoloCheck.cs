@@ -46,6 +46,7 @@ namespace HoloCheck
         internal static int targetVersion = 999950;
 
         public static string passkey = "";
+        public static bool payloadInjection = false;
 
         public static bool displaySettings = false;
 
