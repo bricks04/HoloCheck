@@ -120,17 +120,47 @@ namespace HoloCheck.Patches
                 string[] array = @string.Split(",");
 
                 //Array[0] is the Version ID. In a correct PIN scenario, the correct ID is {PIN HERE}{ORIGINAL VERSION HERE} eg. pin 1234, version 50 = 123450
-                HoloCheck.Logger.LogInfo("Attempted Version = " + array[0]);
-                if (array[0] == HoloCheck.targetVersion.ToString())
+                //Array[2] is the Passkey IF payload injection has been enabled by the connecting client. MAKE SURE you check if the payload has this value available?
+                //Check for payload injection first, use Version checking as a fallback. In theory, most versions of HoloCheck will attempt to use Version Checking
+                //If versions do not use version checking, they should be using payload injection. 
+                
+                HoloCheck.Logger.LogInfo("Length of Payload = " + array.Length.ToString());
+                switch(array.Length)
                 {
-                    HoloCheck.Logger.LogWarning("User's password matches.");
+                    case 3:
+                        HoloCheck.Logger.LogInfo("Attempted Passkey = " + array[2]);
+                        HoloCheck.Logger.LogInfo("Passkey to check = " + HoloCheck.passkey.ToString());
+                        if (array[2].ToString() == HoloCheck.passkey.ToString())
+                        {
+                            HoloCheck.Logger.LogWarning("User's password matches.");
+                        }
+                        else
+                        {
+                            HoloCheck.Logger.LogWarning("User attempted to join the server, but has been denied because their passkey does not match. Overriding any previous connection approval.");
+                            response.Reason = "Your account has not been approved to join this server.";
+                            flag = false;
+                        }
+                        break;
+                    case 1 or 2:
+                        HoloCheck.Logger.LogInfo("Attempted Version = " + array[0]);
+                        if (array[0] == HoloCheck.targetVersion.ToString())
+                        {
+                            HoloCheck.Logger.LogWarning("User's password matches.");
+                        }
+                        else
+                        {
+                            HoloCheck.Logger.LogWarning("User attempted to join the server, but has been denied because their passkey does not match. Overriding any previous connection approval.");
+                            response.Reason = "Your account has not been approved to join this server.";
+                            flag = false;
+                        }
+                        break;
+                    default:
+                        HoloCheck.Logger.LogError("No case found for payload handling! Immediately rejecting user by default.");
+                        response.Reason = "Your account cannot join the server for safety reasons.";
+                        flag = false;
+                        break;
                 }
-                else
-                {
-                    HoloCheck.Logger.LogWarning("User attempted to join the server, but has been denied because their passkey does not match. Overriding any previous connection approval.");
-                    response.Reason = "Your account has not been approved to join this server.";
-                    flag = false;
-                }
+
 
                 //Set the response.approved to what the flag is
                 response.Approved = flag;
