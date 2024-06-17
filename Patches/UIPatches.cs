@@ -95,8 +95,18 @@ namespace HoloCheck.Patches
                 changePasskeyButton.GetComponent<Button>().onClick.AddListener(ChangePasskeyButton);
                 injectorButton.GetComponent<Button>().onClick.AddListener(InjectorButtonPressed);
 
-                injectorButton.GetComponent<Image>().color = Color.white;
-                injectorText.GetComponent<TextMeshProUGUI>().text = "Payload Injection disabled";
+
+                if (HoloCheck.payloadInjection)
+                {
+                    injectorButton.GetComponent<Image>().color = Color.green;
+                    injectorText.GetComponent<TextMeshProUGUI>().text = "Payload Injection enabled";
+                }
+                else
+                {
+                    injectorButton.GetComponent<Image>().color = Color.white;
+                    injectorText.GetComponent<TextMeshProUGUI>().text = "Payload Injection disabled";
+                }
+                
 
                 // Debugging stuff
                 //EnableHoloCheckSettingsPanel();
@@ -117,11 +127,15 @@ namespace HoloCheck.Patches
             if (HoloCheck.payloadInjection)
             {
                 injectorButton.GetComponent<Image>().color = Color.green;
+                //Invoke VersionPatches here with no passkey to reset the version number.
+                VersionPatches.ResetVersionNumber();
                 injectorText.GetComponent<TextMeshProUGUI>().text = "Payload Injection enabled";
             }
             else
             {
                 injectorButton.GetComponent<Image>().color = Color.white;
+                //Forcefully invoke VersionPatches here to ensure that user enters with a modified version number.
+                VersionPatches.ChangePasskey(HoloCheck.passkey);
                 injectorText.GetComponent<TextMeshProUGUI>().text = "Payload Injection disabled";
 
             }
