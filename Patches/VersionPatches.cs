@@ -37,6 +37,20 @@ namespace HoloCheck.Patches
                 ChangeVersionWithPasskey(passkey, instance);
             }
         }
+
+        public static void ResetVersionNumber()
+        {
+            if (instance.gameVersionNum != HoloCheck.originalVersion)
+            {
+                instance.gameVersionNum = HoloCheck.originalVersion;
+                HoloCheck.Logger.LogInfo("Resetting the version back to the original number.");
+                HoloCheck.Logger.LogInfo("The new version is = " + instance.gameVersionNum.ToString());
+            }
+            else
+            {
+                HoloCheck.Logger.LogWarning("Detected version matches the target version! ");
+            }
+        }
         private static void ChangeVersionWithPasskey(string passkey, GameNetworkManager __instance)
         {
             HoloCheck.Logger.LogInfo("VersionPatches awoken!");
