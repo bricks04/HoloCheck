@@ -10,6 +10,7 @@ namespace HoloCheck
     {
         public readonly ConfigEntry<string> configAllowedSteamIDs;
         public readonly ConfigEntry<string> configPasskey;
+        public readonly ConfigEntry<bool> configPayloadInjection;
 
         public HoloCheckConfig(ConfigFile cfg)
         {
@@ -26,6 +27,12 @@ namespace HoloCheck
                                                 "Allowed Steam IDs",
                                                 "",
                                                 "A comma-separated string, containing a list of Steam IDs that you wish to allow entry into your servers. Ensure that there is no whitespace in the string. Example - '123456789,987654321,011131017'. YOUR STEAM ID IS NOT THE SAME THING AS THE STEAM FRIEND CODE! Obtain steam IDs by going to your profile, and taking the numbers at the end of the URL. ");
+
+            configPayloadInjection = cfg.Bind("General",
+                                                "Payload Injection Method",
+                                                false,
+                                                "Whether to utilise payload injections or version changes for passkey checking. Set to true if you do not wish for the version number to be changed eg. A different mod modifies this number and actively uses it.");
+
 
             //configPasskey = cfg.Bind("General",
             //                                    "Passkey Checking",
@@ -46,6 +53,8 @@ namespace HoloCheck
         internal static int targetVersion = 999950;
 
         public static string passkey = "";
+        //If payload injection is true, do not process version. 
+        public static bool payloadInjection = false;
 
         public static bool displaySettings = false;
 
@@ -59,6 +68,7 @@ namespace HoloCheck
             }
             Logger.LogInfo(saveResult);
             BoundConfig.configAllowedSteamIDs.BoxedValue = saveResult;
+            BoundConfig.configPayloadInjection.BoxedValue = payloadInjection;
         }
 
         private void Awake()
@@ -70,6 +80,8 @@ namespace HoloCheck
             {
                 allowedSteamIDs = [];
             }
+
+            payloadInjection = (bool)BoundConfig.configPayloadInjection.BoxedValue;
 
             passkey = "";
 

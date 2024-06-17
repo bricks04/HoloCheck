@@ -14,19 +14,28 @@ namespace HoloCheck.Patches
         private static void StartPostFix(GameNetworkManager __instance)
         {
             instance = __instance;
-            ChangeVersionWithPasskey(HoloCheck.passkey, __instance);
+            if (!HoloCheck.payloadInjection)
+            {
+                ChangeVersionWithPasskey(HoloCheck.passkey, __instance);
+            }
         }
 
         [HarmonyPatch("JoinLobby")]
         [HarmonyPrefix]
         private static void JoinLobbyPrefix(GameNetworkManager __instance)
         {
-            ChangeVersionWithPasskey(HoloCheck.passkey, __instance);
+            if (!HoloCheck.payloadInjection)
+            {
+                ChangeVersionWithPasskey(HoloCheck.passkey, __instance);
+            }
         }
 
         public static void ChangePasskey(string passkey)
         {
-            ChangeVersionWithPasskey(passkey, instance);
+            if (!HoloCheck.payloadInjection)
+            {
+                ChangeVersionWithPasskey(passkey, instance);
+            }
         }
         private static void ChangeVersionWithPasskey(string passkey, GameNetworkManager __instance)
         {

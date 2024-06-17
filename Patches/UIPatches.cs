@@ -31,6 +31,9 @@ namespace HoloCheck.Patches
         private static RectTransform settingsClosedPasskeyPosition;
         private static RectTransform settingsOpenPasskeyPosition;
 
+        public static GameObject injectorButton;
+        public static GameObject injectorText;
+
         [HarmonyPatch("Awake")]
         [HarmonyPrefix]
         private static void AwakePrefix()
@@ -79,6 +82,9 @@ namespace HoloCheck.Patches
                 settingsClosedPasskeyPosition = instantiatedUI.transform.Find("Canvas").Find("Menu Closed Passkey").gameObject.GetComponent<RectTransform>();
                 settingsOpenPasskeyPosition = instantiatedUI.transform.Find("Canvas").Find("Menu Opened Passkey").gameObject.GetComponent<RectTransform>();
 
+                injectorButton = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Injector Mode").Find("InjectorButton").gameObject;
+                injectorText = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Injector Mode").Find("Text (TMP)").gameObject;
+
                 passkeyField.GetComponent<TMP_InputField>().text = "****";
 
                 //HoloCheck.Logger.LogInfo(enableHoloCheckSettingsButton.GetComponent<Button>());
@@ -87,6 +93,11 @@ namespace HoloCheck.Patches
                 disableHoloCheckSettingsButton.GetComponent<Button>().onClick.AddListener(DisableHoloCheckSettingsPanel);
                 revealPasskeyButton.GetComponent<Button>().onClick.AddListener(RevealPasskeyButton);
                 changePasskeyButton.GetComponent<Button>().onClick.AddListener(ChangePasskeyButton);
+                injectorButton.GetComponent<Button>().onClick.AddListener(InjectorButtonPressed);
+
+                injectorButton.GetComponent<Image>().color = Color.white;
+                injectorText.GetComponent<TextMeshProUGUI>().text = "Payload Injection disabled";
+
                 // Debugging stuff
                 //EnableHoloCheckSettingsPanel();
 
@@ -96,6 +107,23 @@ namespace HoloCheck.Patches
             catch (Exception e)
             {
                 HoloCheck.Logger.LogError(e);
+            }
+        }
+
+        private static void InjectorButtonPressed()
+        {
+            HoloCheck.Logger.LogInfo("Injector Button pressed!");
+            HoloCheck.payloadInjection = !HoloCheck.payloadInjection;
+            if (HoloCheck.payloadInjection)
+            {
+                injectorButton.GetComponent<Image>().color = Color.green;
+                injectorText.GetComponent<TextMeshProUGUI>().text = "Payload Injection enabled";
+            }
+            else
+            {
+                injectorButton.GetComponent<Image>().color = Color.white;
+                injectorText.GetComponent<TextMeshProUGUI>().text = "Payload Injection disabled";
+
             }
         }
 
