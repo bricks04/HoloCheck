@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Steamworks;
 using UnityEngine.Device;
+using System.Text.RegularExpressions;
 
 
 namespace HoloCheck.Patches
@@ -161,31 +162,44 @@ namespace HoloCheck.Patches
         private static void ChangePasskeyButton()
         {
             HoloCheck.Logger.LogInfo("Change Passkey button pressed! Attempting to change passkey to " + passkeyField.GetComponent<TMP_InputField>().text);
-            if (int.TryParse(passkeyField.GetComponent<TMP_InputField>().text, out int result) | passkeyField.GetComponent<TMP_InputField>().text.Length == 0)
+            string checkResult = CheckStringPasskeyValidity(passkeyField.GetComponent<TMP_InputField>().text);
+            if (checkResult == "" | passkeyField.GetComponent<TMP_InputField>().text.Length == 0)
             {
-                if (passkeyField.GetComponent<TMP_InputField>().text.Length <= 4)
+                HoloCheck.passkey = passkeyField.GetComponent<TMP_InputField>().text;
+                VersionPatches.ChangePasskey(HoloCheck.passkey);
+                HoloCheck.SaveConfig();
+                pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Change successful.";
+                pendingChangesAlert.SetActive(true);
+                RewriteRuleset();
+            }
+            else
+            {
+                HoloCheck.Logger.LogError(checkResult.Split("|")[0]);
+                pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = checkResult.Split("|")[1];
+                pendingChangesAlert.SetActive(true);
+            }
+            
+        }
+
+        //Check for passkey validity. Return an integer that represents if the passkey is OK, or not. 
+        public static string CheckStringPasskeyValidity(string passkeyToCheck)
+        {
+            if (Regex.IsMatch(passkeyToCheck, @"^\d*$"))
+            {
+                if (Regex.IsMatch(passkeyToCheck, @"^\d{1,4}$"))
                 {
-                    HoloCheck.passkey = passkeyField.GetComponent<TMP_InputField>().text;
-                    VersionPatches.ChangePasskey(HoloCheck.passkey);
-                    HoloCheck.SaveConfig();
-                    pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Change successful.";
-                    pendingChangesAlert.SetActive(true);
-                    RewriteRuleset();
+                    return "";
                 }
                 else
                 {
-                    HoloCheck.Logger.LogError("Entered passkey value is too long!");
-                    pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Entered value too long! (4 max)";
-                    pendingChangesAlert.SetActive(true);
+                    return "Entered passkey value is too long!|> Entered value too long! (4 max)";
                 }
             }
             else
             {
-                HoloCheck.Logger.LogError("Entered passkey value is not a number!");
-                pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Entered value is not a number!";
-                pendingChangesAlert.SetActive(true);
+                return "Entered passkey value is not a number!|> Entered value is not a number!";
             }
-            
+            return "Internal error!|> Internal Error!";
         }
 
         private static void RevealPasskeyButton()
