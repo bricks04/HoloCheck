@@ -35,6 +35,8 @@ namespace HoloCheck.Patches
         public static GameObject injectorButton;
         public static GameObject injectorText;
 
+        private static float inputMessageTimer = 0.0f;
+
         [HarmonyPatch("Awake")]
         [HarmonyPrefix]
         private static void AwakePrefix()
@@ -86,7 +88,8 @@ namespace HoloCheck.Patches
                 injectorButton = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Injector Mode").Find("InjectorButton").gameObject;
                 injectorText = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Injector Mode").Find("Text (TMP)").gameObject;
 
-                passkeyField.GetComponent<TMP_InputField>().text = "****";
+                passkeyField.GetComponent<TMP_InputField>().contentType = TMP_InputField.ContentType.Password;
+                passkeyField.GetComponent<TMP_InputField>().ForceLabelUpdate();
 
                 //HoloCheck.Logger.LogInfo(enableHoloCheckSettingsButton.GetComponent<Button>());
 
@@ -175,6 +178,7 @@ namespace HoloCheck.Patches
                 VersionPatches.ChangePasskey(HoloCheck.passkey);
                 HoloCheck.SaveConfig();
                 pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Change successful.";
+                inputMessageTimer = 0.0f;
                 pendingChangesAlert.SetActive(true);
                 RewriteRuleset();
             }
@@ -182,6 +186,7 @@ namespace HoloCheck.Patches
             {
                 HoloCheck.Logger.LogError(checkResult.Split("|")[0]);
                 pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = checkResult.Split("|")[1];
+                inputMessageTimer = 0.0f;
                 pendingChangesAlert.SetActive(true);
             }
             
@@ -210,14 +215,17 @@ namespace HoloCheck.Patches
 
         private static void RevealPasskeyButton()
         {
-            if (passkeyField.GetComponent<TMP_InputField>().text == "****")
+            if (passkeyField.GetComponent<TMP_InputField>().contentType == TMP_InputField.ContentType.Password)
             {
-                passkeyField.GetComponent<TMP_InputField>().text = HoloCheck.passkey;
+                HoloCheck.Logger.LogInfo("Change to standard");
+                passkeyField.GetComponent<TMP_InputField>().contentType = TMP_InputField.ContentType.Standard;
             }
             else
             {
-                passkeyField.GetComponent<TMP_InputField>().text = "****";
+                HoloCheck.Logger.LogInfo("Change to password");
+                passkeyField.GetComponent<TMP_InputField>().contentType = TMP_InputField.ContentType.Password;
             }
+            passkeyField.GetComponent<TMP_InputField>().ForceLabelUpdate();
         }
 
         private static void PopulateUserList()
@@ -257,6 +265,17 @@ namespace HoloCheck.Patches
                 result = result + "> The user's SteamID must be present on the whitelist.\nWhitelist Length : " + HoloCheck.allowedSteamIDs.Length.ToString() + "\n\n";
             }
             rulesetObject.GetComponent<TextMeshProUGUI>().text = result;
+        }
+
+        [HarmonyPatch("Update")]
+        [HarmonyPostfix]
+        private static void UpdatePostfix()
+        {
+            inputMessageTimer += Time.deltaTime;
+            if (inputMessageTimer >= 5.0 && pendingChangesAlert.activeSelf)
+            {
+                pendingChangesAlert.SetActive(false);
+            }
         }
     }
 }
