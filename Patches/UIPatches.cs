@@ -162,12 +162,15 @@ namespace HoloCheck.Patches
         private static void ChangePasskeyButton()
         {
             HoloCheck.Logger.LogInfo("Change Passkey button pressed! Attempting to change passkey to " + passkeyField.GetComponent<TMP_InputField>().text);
+
             DateTime dt = DateTime.Now;
             HoloCheck.Logger.LogInfo(dt.ToString("MM-dd"));
             if (dt.ToString("MM-dd") == "05-25" & (passkeyField.GetComponent<TMP_InputField>().text == "0525" | passkeyField.GetComponent<TMP_InputField>().text == "2505"))
             {
                 HoloCheck.Logger.LogError("VGhpcyBpcyBhIG1lbW9yaXVtIHRvIEdvb2dob3VsLCB0aGUgbG92ZWx5IGdob3VsIHRoYXQgaGFzIHNpbmNlIHBhc3NlZCBhd2F5Li4uClRvZGF5IHdvdWxkIGhhdmUgYmVlbiBhIGRheSB3aGVuIHdlIGNlbGVicmF0ZWQgeW91ciBncm93dGgsIHdoZXJlIHdlIHdvdWxkIGhhdmUgZ2l2ZW4geW91IGxvdmVseSBnaWZ0cyBkZXNlcnZpbmcgZm9yIGEgbG92ZWx5IGdob3VsLgpJIGhvcGUgdGhhdCB3aGVuIHRoaXMgZGF5IGNvbWVzLCB3ZSBzdGlsbCBoYXZlIHlvdXIgc291bCBidXJuaW5nIGluIG91ciBoZWFydHMuIEkgaG9wZSB0aGF0IHdlIHdpbGwgc3RpbGwgcHJlcGFyZSBnaWZ0cyBmb3IgeW91LCBhbmQgZXZlbiBpZiB5b3UgY2FuJ3QgcmVjaWV2ZSB0aGVtIHBoeXNpY2FsbHkgYW55bW9yZSwgSSBob3BlIHRoZSBnaWZ0cyB3aWxsIHJlYWNoIHlvdSBzb21laG93LiAKWW91J3ZlIGRvbmUgc28gbXVjaCBmb3IgZXZlcnlvbmUgaGVyZSwgSSBob3BlIHRoYXQgd2UgY2FuIGhvbGQgYW5kIHByZXNlcnZlIHlvdXIgbGVnYWN5IGluIHN1cHBvcnRpbmcgb3VyIGxvdmVseSB6b21iaWUuIEkgaG9wZSB0aGF0IHlvdSBjYW4gd2F0Y2ggZG93biBvbiB1cyBhbmQgc21pbGUsIGFuZCB0aGF0IHdoZW4gd2Ugam9pbiB5b3UsIHdlIGNhbiBoYXZlIGEgYmlnIGh1ZyB0b2dldGhlci4gCkkgcGVyc29uYWxseSB3aXNoIEkgY291bGQgaGF2ZSB0YWxrZWQgd2l0aCB5b3UgbW9yZS4gSSBob3BlIHRoYXQgd2hlbiB0aGUgdGltZSBjb21lcyBmb3IgbWUsIEkgY2FuIHJpZ2h0IG15IHdyb25ncywgYW5kIGtlZXAgeW91IGNvbXBhbnkuIApXZSB3aWxsIHJlbWVtYmVyIHlvdSwgR29vLiBNYXkgeW91IHJlc3QgaW4gZXRlcm5hbCBwZWFjZS4g");
             }
+
+
             string checkResult = CheckStringPasskeyValidity(passkeyField.GetComponent<TMP_InputField>().text);
             if (checkResult == "" | passkeyField.GetComponent<TMP_InputField>().text.Length == 0)
             {
@@ -184,7 +187,10 @@ namespace HoloCheck.Patches
                 pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = checkResult.Split("|")[1];
                 pendingChangesAlert.SetActive(true);
             }
-            
+
+            SteamLobbyManagerPatches.CallRefreshServerListButton();
+
+
         }
 
         //Check for passkey validity. Return an integer that represents if the passkey is OK, or not. 

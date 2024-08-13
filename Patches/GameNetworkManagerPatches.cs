@@ -23,7 +23,7 @@ namespace HoloCheck.Patches
         private static void ConnectionApprovalPostFix(GameNetworkManager __instance, NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
             // Debug, highly inefficient as we decode the payload later anyway.
-            HoloCheck.Logger.LogInfo("Decoded Payload of joiner : " + Encoding.ASCII.GetString(request.Payload));
+            //HoloCheck.Logger.LogInfo("Decoded Payload of joiner : " + Encoding.ASCII.GetString(request.Payload));
             if (HoloCheck.allowedSteamIDs.Length > 0) 
             {
                 CheckForSteamID(__instance, request, response);
