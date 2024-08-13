@@ -4,6 +4,7 @@ using System;
 using System.Text;
 using Unity.Netcode;
 using Steamworks;
+using Steamworks.Data;
 
 
 namespace HoloCheck.Patches
@@ -55,6 +56,23 @@ namespace HoloCheck.Patches
                 HoloCheck.Logger.LogInfo("Post-injection Connection data = " + Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData));
             }
             
+        }
+
+        [HarmonyPatch("SteamMatchmaking_OnLobbyCreated")]
+        [HarmonyPostfix]
+        private static void S_OnLobbyCreatedPostFix(GameNetworkManager __instance, ref Steamworks.Result result, ref Lobby lobby)
+        {
+            HoloCheck.Logger.LogInfo("Running onLobbyCreated patch");
+            HoloCheck.Logger.LogInfo(result);
+            HoloCheck.Logger.LogInfo(lobby);
+            if (!__instance.disableSteam && __instance.lobbyHostSettings.isLobbyPublic)
+            {
+                if (HoloCheck.allowedSteamIDs.Length > 0 || HoloCheck.passkey.Length > 0)
+                {
+                    HoloCheck.Logger.LogInfo("Changing the lobby mode to an Invisible lobby. ");
+                    lobby.SetInvisible();
+                }
+            }
         }
 
         private static void CheckForSteamID(GameNetworkManager __instance, NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
