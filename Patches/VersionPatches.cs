@@ -80,7 +80,7 @@ namespace HoloCheck.Patches
             }
             else
             {
-                HoloCheck.Logger.LogWarning("Detected version matches the target version! Your lobbies will not have Passkey protection enabled! ");
+                HoloCheck.Logger.LogWarning("Detected version matches the target version!");
             }
         }
     }
