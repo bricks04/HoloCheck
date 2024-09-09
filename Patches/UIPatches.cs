@@ -127,10 +127,10 @@ namespace HoloCheck.Patches
         //Temporary fix to alert the user to restart their game should an unexpected error happen. 
         [HarmonyPatch("SetLoadingScreen")]
         [HarmonyPostfix]
-        private static void SetLoadingScreenPostfix(RoomEnter result)
+        private static void SetLoadingScreenPostfix(bool isLoading, RoomEnter result)
         {
             HoloCheck.Logger.LogInfo("RoomEnter Result = " + result.ToString());
-            if (result == RoomEnter.Error)
+            if (result == RoomEnter.Error && !isLoading)
             {
                 HoloCheck.Logger.LogError("Fatal RoomEnter result detected! Please RESTART your game before reattempting join!");
                 DisplayRestartWarning();
