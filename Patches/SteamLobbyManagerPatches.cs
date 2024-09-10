@@ -30,5 +30,16 @@ namespace HoloCheck.Patches
                 lobbyManager.RefreshServerListButton();
             }
         }
+
+        [HarmonyPatch("LoadServerList")]
+        [HarmonyPostfix]
+        private static void LoadServerListPostfix()
+        {
+            if (HoloCheck.passkey == "")
+            {
+                HoloCheck.Logger.LogWarning("Accessing the server list with no passkey set!");
+                UIPatches.DisplayWarningMessage("> No Passkey Set!", 10.0f);
+            }
+        }
     }
 }

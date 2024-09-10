@@ -36,6 +36,7 @@ namespace HoloCheck.Patches
         public static GameObject injectorText;
 
         private static float inputMessageTimer = 0.0f;
+        private static bool userWarned = false;
 
         [HarmonyPatch("Awake")]
         [HarmonyPrefix]
@@ -58,7 +59,6 @@ namespace HoloCheck.Patches
             }
         }
 
-        //Patch disabled as not ready yet
         [HarmonyPatch("Awake")]
         [HarmonyPostfix]
         private static void AwakePostfix()
@@ -124,6 +124,24 @@ namespace HoloCheck.Patches
             }
         }
 
+        //No-Passkey Warning system
+        [HarmonyPatch("ConfirmHostButton")]
+        [HarmonyPrefix]
+        private static bool ConfirmHostButtonPrefix(MenuManager __instance)
+        {
+            HoloCheck.Logger.LogInfo("Host Button Confirm pressed!");
+            if (HoloCheck.passkey == "" && !userWarned)
+            {
+                HoloCheck.Logger.LogWarning("No passkey and user has not been warned!");
+                __instance.tipTextHostSettings.text = "You are about to create a lobby without a passkey!\nPress [Confirm] again to proceed.";
+                userWarned = true;
+                return false; // This is a forced skip through Harmony that will skip the remainder of ConfirmHostButton. 
+            }
+            else
+            {
+                return true;
+            }
+        }
         private static void InjectorButtonPressed()
         {
             HoloCheck.Logger.LogInfo("Injector Button pressed!");
@@ -181,6 +199,7 @@ namespace HoloCheck.Patches
                 VersionPatches.ChangePasskey(HoloCheck.passkey);
                 HoloCheck.SaveConfig();
                 pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Change successful.";
+                userWarned = false;
                 inputMessageTimer = 0.0f;
                 pendingChangesAlert.SetActive(true);
                 RewriteRuleset();
@@ -196,6 +215,13 @@ namespace HoloCheck.Patches
             SteamLobbyManagerPatches.CallRefreshServerListButton();
 
 
+        }
+
+        public static void DisplayWarningMessage(string message, float time = 5.0f)
+        {
+            pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = message;
+            inputMessageTimer = 5.0f - time;
+            pendingChangesAlert.SetActive(true);
         }
 
         //Check for passkey validity. Return an integer that represents if the passkey is OK, or not. 
