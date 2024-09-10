@@ -217,6 +217,13 @@ namespace HoloCheck.Patches
 
         }
 
+        public static void DisplayWarningMessage(string message, float time = 5.0f)
+        {
+            pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = message;
+            inputMessageTimer = 5.0f - time;
+            pendingChangesAlert.SetActive(true);
+        }
+
         //Check for passkey validity. Return an integer that represents if the passkey is OK, or not. 
         public static string CheckStringPasskeyValidity(string passkeyToCheck)
         {
