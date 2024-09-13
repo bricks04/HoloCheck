@@ -89,6 +89,14 @@ namespace HoloCheck.Patches
                 injectorText = instantiatedUI.transform.Find("Canvas").Find("HoloCheckPanel").Find("Injector Mode").Find("Text (TMP)").gameObject;
 
                 passkeyField.GetComponent<TMP_InputField>().contentType = TMP_InputField.ContentType.Password;
+                if (HoloCheck.passkey != "")
+                {
+                    passkeyField.GetComponent<TMP_InputField>().text = HoloCheck.passkey;
+                }
+                else
+                {
+                    passkeyField.GetComponent<TMP_InputField>().text = "";
+                }
                 passkeyField.GetComponent<TMP_InputField>().ForceLabelUpdate();
 
                 //HoloCheck.Logger.LogInfo(enableHoloCheckSettingsButton.GetComponent<Button>());
