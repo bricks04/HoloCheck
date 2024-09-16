@@ -132,6 +132,27 @@ namespace HoloCheck.Patches
             }
         }
 
+        //Temporary fix to alert the user to restart their game should an unexpected error happen. 
+        [HarmonyPatch("SetLoadingScreen")]
+        [HarmonyPostfix]
+        private static void SetLoadingScreenPostfix(bool isLoading, RoomEnter result)
+        {
+            HoloCheck.Logger.LogInfo("RoomEnter Result = " + result.ToString());
+            if (result == RoomEnter.Error && !isLoading)
+            {
+                HoloCheck.Logger.LogError("Fatal RoomEnter result detected! Please RESTART your game before reattempting join!");
+                DisplayRestartWarning();
+            }
+        }
+
+        private static void DisplayRestartWarning()
+        {
+            pendingChangesAlert.GetComponent<TextMeshProUGUI>().text = "> Unexpected error. Please restart game.";
+            inputMessageTimer = -60.0f;
+            pendingChangesAlert.GetComponent<TextMeshProUGUI>().color = Color.red;
+            pendingChangesAlert.SetActive(true);
+        }
+
         //No-Passkey Warning system
         [HarmonyPatch("ConfirmHostButton")]
         [HarmonyPrefix]
@@ -150,6 +171,7 @@ namespace HoloCheck.Patches
                 return true;
             }
         }
+
         private static void InjectorButtonPressed()
         {
             HoloCheck.Logger.LogInfo("Injector Button pressed!");
